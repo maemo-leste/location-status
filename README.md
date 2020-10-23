@@ -1,0 +1,1 @@
+# status-area-applet-location

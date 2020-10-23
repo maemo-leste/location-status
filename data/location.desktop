@@ -1,0 +1,8 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Name=tncpa_li_plugin_sb_location
+Icon=qgn_list_cp_location
+X-Path=liblocation.so
+Type=default
+Category=Conditional
