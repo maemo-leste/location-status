@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2020 Ivan J. <parazyd@dyne.org>
  *
- * This file is part of status-area-applet-location
+ * This file is part of location-status
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
