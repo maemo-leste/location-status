@@ -1,0 +1,20 @@
+Source: location-status
+Section: misc
+Priority: optional
+Maintainer: Ivan J. <parazyd@dyne.org>
+Build-Depends:
+ debhelper (>= 10),
+ libhildon1-dev,
+ libhildondesktop1-dev
+ libdbus-glib-1-dev,
+ libdbus-1-dev,
+ libosso-dev,
+ liblocation-dev,
+Standards-Version: 4.3.0
+
+Package: location-status
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ osso-location-ui-l10n-mr0,
+Description: Statusbar applet to indicate location status
+ A Statusbar applet showing location status

@@ -1,1 +1,2 @@
-# status-area-applet-location
+location-status
+===============

@@ -1,0 +1,292 @@
+location-status (0.106-1) unstable; urgency=low
+
+  * Fixes: NB#140753 - Status-menu location icon is updated although statusbar
+    isn't visible (task switcher open)
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Wed, 25 Nov 2009 10:26:33 +0200
+
+location-status (0.105-1) unstable; urgency=low
+
+  * Fixes: NB#138544 - Location-related componets are spamming syslog
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Tue, 15 Sep 2009 14:34:30 +0300
+
+location-status (0.104-1) unstable; urgency=low
+
+  * Fixes: NB#135127 - Starts "searching" when the location home applet is turned off
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Thu, 03 Sep 2009 15:21:12 +0300
+
+location-status (0.103-1) unstable; urgency=low
+
+  * Fixes: NB#135127 - Starts "searching" when the location home applet is turned off
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Fri, 28 Aug 2009 12:35:12 +0300
+
+location-status (0.102-1) unstable; urgency=low
+
+  * Fixes: NB#126732 - Hildon desktop wakes up the system too often in idle
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Fri, 21 Aug 2009 12:03:41 +0300
+
+location-status (0.101-1) unstable; urgency=low
+
+  * Fixes: NB#131438 - location-sb spamming syslog
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Fir, 07 Aug 2009 16:47:07 +0300
+
+location-status (0.100-1) unstable; urgency=low
+
+  * Fixes: NB#126732 - Hildon desktop wakes up the system too often in idle
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Mon, 13 Jul 2009 14:07:42 +0300
+
+location-status (0.99-1) unstable; urgency=low
+
+  * Fixes: NB#126969 - location button in status menu - not using right
+    ActiveTextColor and button background?
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Fri, 10 Jul 2009 15:35:08 +0300
+
+location-status (0.98-1) unstable; urgency=low
+
+  * Fixes: NB#111915 - Wrong text colour in Location status menu item.
+  * Removed the unneeded linking with liblocation.
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Wed, 22 Apr 2009 14:32:27 +0300
+
+location-status (0.97-1) unstable; urgency=low
+
+  * Revert a not required workaround for location-daemon.
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Fri, 17 Apr 2009 15:21:54 +0300
+
+location-status (0.96-1) unstable; urgency=low
+
+  * Fixed two problems when interacting with location-daemon.
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Thu, 09 Apr 2009 12:59:50 +0300
+
+location-status (0.95-1) unstable; urgency=low
+
+  * Updated to use Coarse/Fine.
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Wed, 08 Apr 2009 09:03:24 +0300
+
+location-status (0.94-1) unstable; urgency=low
+
+  * show whether GPS or non-GPS tracking is done
+    Fixed: NB#98343 - an obsolete logical string is no longer used
+  * small cleanups
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Tue, 10 Feb 2009 22:30:27 +0200
+
+location-status (0.93-1) unstable; urgency=low
+
+  * Fixed localization.
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Wed, 03 Dec 2008 15:05:21 +0200
+
+location-status (0.92-1) unstable; urgency=low
+
+  * Added check if location daemon is running when plugin is started.
+  * Fixed debian dependencies.
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Tue, 11 Nov 2008 12:59:44 +0200
+
+location-status (0.91-1) unstable; urgency=low
+
+  * Changed to status menu plugin.
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Tue, 11 Nov 2008 10:18:03 +0200
+
+location-status (0.90-2) unstable; urgency=low
+
+  * Updated debug package dependencies.
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Tue, 08 Jul 2008 12:45:43 +0300
+
+location-status (0.90-1) unstable; urgency=low
+
+  * Initial version for the new location framework.
+
+ -- Quanyi Sun <Quanyi.Sun@nokia.com>  Fri, 04 Jul 2008 13:42:16 +0300
+
+osso-statusbar-gps (0.24-1) unstable; urgency=low
+
+  * Use a logical ID for panels name.
+  * Fixed: NB#70385
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Wed, 26 Sep 2007 15:09:00 +0100
+
+osso-statusbar-gps (0.23-1) unstable; urgency=low
+
+  * Use a logical ID for panels name.
+  * Fixed: NB#70385
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Thu, 20 Sep 2007 15:09:00 +0100
+
+osso-statusbar-gps (0.22-1) unstable; urgency=low
+
+  * Disconnect the handler signals
+  * Fix intltool issue
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Fri, 14 Sep 2007 11:02:04 +0100
+
+osso-statusbar-gps (0.21-2) unstable; urgency=low
+
+  * Bump required versions in the deb/control file
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Thu, 13 Sep 2007 12:33:36 +0100
+
+osso-statusbar-gps (0.21-1) unstable; urgency=low
+
+  * Use the new gpsd-running/stopped signals.
+  * Fixed: NB#66341
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Fri,  7 Sep 2007 10:33:08 +0100
+
+osso-statusbar-gps (0.20) unstable; urgency=low
+
+  * Added empty ALL_LINGUAS to configure.ac
+  * Removed Makefile.in.in since autogen.sh copies it from the system
+  * Fixed: NB#65992
+  * Added build dependency to liblocation-dev
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Mon, 20 Aug 2007 15:12:26 +0300
+
+osso-statusbar-gps (0.19-1) unstable; urgency=low
+
+  * Set the status and mode correctly, so we don't flick to Green by accident
+  * Fixed: NB#64510
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Fri, 17 Aug 2007 12:51:27 +0100
+
+osso-statusbar-gps (0.18-1) unstable; urgency=low
+
+  * Listen for gpsd quitting and hide the applet when it does.
+  * Fixed: NB#65578
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Tue, 14 Aug 2007 18:07:24 +0100
+
+osso-statusbar-gps (0.17-1) unstable; urgency=low
+
+  * Remove the D-Bus matches. Fixed: NB#64668
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Wed,  1 Aug 2007 11:50:08 +0100
+
+osso-statusbar-gps (0.16-1) unstable; urgency=low
+
+  * Added libgpsmgr-dev to Build-Depends
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Wed, 25 Jul 2007 13:21:50 +0300
+
+osso-statusbar-gps (0.15-1) unstable; urgency=low
+
+  * Make SBP turn on and off and listen for the connection.
+  * Fixed: NB#63524, NB#62633, NB#62135, NB#62127
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Tue, 24 Jul 2007 17:27:44 +0100
+
+osso-statusbar-gps (0.14-1) unstable; urgency=low
+
+  * Make SBP turn on and off listen for the connection
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Wed, 18 Jul 2007 12:20:47 +0100
+
+osso-statusbar-gps (0.13-1) unstable; urgency=low
+
+   * Removed mandatory line.
+   * Fixed: NB#62412
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Mon,  9 Jul 2007 18:36:23 +0100
+
+osso-statusbar-gps (0.12-1) unstable; urgency=low
+
+  * Remove broken dependencies
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Tue,  3 Jul 2007 18:58:12 +0100
+
+osso-statusbar-gps (0.11-1) unstable; urgency=low
+
+  * Removed the location line.
+  * Fixed: NB#61392
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Tue, 26 Jun 2007 16:30:42 +0100
+
+osso-statusbar-gps (0.10-1) unstable; urgency=low
+
+  * Fix the i18n
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Thu, 21 Jun 2007 08:45:23 +0100
+
+osso-statusbar-gps (0.9-1) unstable; urgency=low
+
+  * Add l10n control deps
+  * Fixed: NB#60753
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Wed, 20 Jun 2007 12:07:52 +0100
+
+osso-statusbar-gps (0.8-1) unstable; urgency=low
+
+  * Fix i18n
+  * Fixed: NB#60753
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Tue, 19 Jun 2007 14:14:00 +0000
+
+osso-statusbar-gps (0.7-2) unstable; urgency=low
+
+  * Add debug package.
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Thu,  7 Jun 2007 12:18:37 +0100
+
+osso-statusbar-gps (0.7-1) unstable; urgency=low
+
+  * Reimplement for the new API.
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Tue,  5 Jun 2007 18:25:43 +0100
+
+osso-statusbar-gps (0.6-1) unstable; urgency=low
+
+  * Fix the control
+  * Use the correct icons for the statusbar
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Wed, 23 May 2007 15:24:00 +0000
+
+osso-statusbar-gps (0.5-1) unstable; urgency=low
+
+  * Use correct version for liblocation
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Wed, 16 May 2007 10:55:00 +0000
+
+osso-statusbar-gps (0.4-2) unstable; urgency=low
+
+  * Remove a deprecated build dependency
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Thu, 10 May 2007 12:01:16 +0000
+
+osso-statusbar-gps (0.4-1) unstable; urgency=low
+
+  * Fix control issues
+  * Remove debugging
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Thu, 10 May 2007 12:01:16 +0100
+
+osso-statusbar-gps (0.3-1) unstable; urgency=low
+
+  * Update for osso 1.1
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Wed,  2 May 2007 15:34:00 +0000
+
+osso-statusbar-gps (0.2-1) unstable; urgency=low
+
+  * Build fixes
+  * Make the plugin conditional and hide show whenever GPS is on/off line
+
+ -- Mikko Korpelainen <mikko.korpelainen@nokia.com>  Thu, 26 Apr 2007 16:58:00 +0000
+
+osso-statusbar-gps (0.1-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- unknown <x@x.com>  Wed, 14 Mar 2007 15:58:49 +0000
