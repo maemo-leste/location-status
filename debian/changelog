@@ -1,3 +1,9 @@
+location-status (0.110-1) unstable; urgency=low
+
+  * Initial Leste implementation.
+
+ -- Ivan J. <parazyd@dyne.org>  Mon, 03 May 2021 19:42:14 +0200
+
 location-status (0.106-1) unstable; urgency=low
 
   * Fixes: NB#140753 - Status-menu location icon is updated although statusbar
