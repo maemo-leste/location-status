@@ -80,7 +80,8 @@ static int execute_cp_plugin(gpointer obj)
 	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
 
 	/* BUG: The status menu doesn't close when button is clicked */
-	if (osso_cp_plugin_execute(p->osso, "liblocation_applet.so", obj, TRUE) == -1)
+	if (osso_cp_plugin_execute(
+			p->osso, "liblocation_applet.so", obj, TRUE) == OSSO_ERROR)
 		status_debug("location-sb: Error starting location cp applet");
 
 	return 0;
