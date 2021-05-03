@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 #include <config.h>
 
 #include <dbus/dbus-glib-lowlevel.h>
@@ -25,6 +24,10 @@
 #include <libhildondesktop/libhildondesktop.h>
 #include <libosso.h>
 #include <location/location-gps-device.h>
+
+/* Use this for debugging */
+#include <syslog.h>
+#define status_debug(...) syslog(1, __VA_ARGS__)
 
 typedef struct _LocationStatusMenuItem        LocationStatusMenuItem;
 typedef struct _LocationStatusMenuItemClass   LocationStatusMenuItemClass;
@@ -52,9 +55,9 @@ struct _LocationStatusMenuItemPrivate
 	osso_context_t *osso;
 	GtkContainer *container;
 	DBusConnection *dbus;
-	GdkPixbuf *pix16_gps_searching;
-	GdkPixbuf *pix16_gps_location;
-	GdkPixbuf *pix16_gps_not_connected;
+	GdkPixbuf *pix18_gps_searching;
+	GdkPixbuf *pix18_gps_location;
+	GdkPixbuf *pix18_gps_not_connected;
 	GdkPixbuf *pix48_gps_location;
 	GdkPixbuf *pix48_gps_not_connected;
 	int locationdaemon_running;
@@ -75,10 +78,25 @@ static int execute_cp_plugin(gpointer obj)
 {
 	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
 
+	/* BUG: The status menu doesn't close when button is clicked */
 	if (osso_cp_plugin_execute(p->osso, "liblocation_applet.so", obj, TRUE) == -1)
-		g_warning("location-sb: Error starting location cp applet");
+		status_debug("location-sb: Error starting location cp applet");
 
 	return 0;
+}
+
+static void set_status_icon(gpointer obj, GdkPixbuf *pixbuf)
+{
+	hd_status_plugin_item_set_status_area_icon(
+		HD_STATUS_PLUGIN_ITEM(obj), pixbuf);
+}
+
+static void set_button_icon(gpointer obj, GdkPixbuf *pixbuf)
+{
+	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
+	hildon_button_set_image(HILDON_BUTTON(p->status_button),
+		gtk_image_new_from_pixbuf(pixbuf));
+	hildon_button_set_image_position(HILDON_BUTTON(p->status_button), 0);
 }
 
 static int fix_acquiring_cb(gpointer obj)
@@ -90,11 +108,11 @@ static int fix_acquiring_cb(gpointer obj)
 
 	switch (p->current_status_icon) {
 	case STATUS_ICON_SEARCHING:
-		set_status_icon(p->pix16_gps_location);
+		set_status_icon(obj, p->pix18_gps_location);
 		p->current_status_icon = STATUS_ICON_FOUND;
 		break;
 	case STATUS_ICON_FOUND:
-		set_status_icon(p->pix16_gps_searching);
+		set_status_icon(obj, p->pix18_gps_searching);
 		p->current_status_icon = STATUS_ICON_SEARCHING;
 		break;
 	default:
@@ -107,7 +125,7 @@ static int fix_acquiring_cb(gpointer obj)
 static int fix_acquired(gpointer obj)
 {
 	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
-	set_status_icon(p->pix16_gps_location);
+	set_status_icon(obj, p->pix18_gps_location);
 	p->current_status_icon = STATUS_ICON_FOUND;
 	return 0;
 }
@@ -151,9 +169,13 @@ static int handle_running(gpointer obj, DBusMessage *msg)
 	switch (p->locationdaemon_running) {
 	case 0:
 		/* Stopped */
+		set_status_icon(obj, NULL);
+		set_button_icon(obj, p->pix48_gps_not_connected);
 		break;
 	case 1:
 		/* Started */
+		set_status_icon(obj, p->pix18_gps_not_connected);
+		set_button_icon(obj, p->pix48_gps_location);
 		break;
 	default:
 		break;
@@ -191,7 +213,8 @@ static void location_status_menu_item_init(LocationStatusMenuItem *self)
 		DBUS_BUS_SYSTEM, &err);
 
 	if (dbus_error_is_set(&err)) {
-		g_warning("location-sb: Error getting dbus system bus: %s", err.message);
+		status_debug("location-sb: Error getting dbus system bus: %s",
+			err.message);
 		dbus_error_free(&err);
 		return;
 	}
@@ -203,9 +226,8 @@ static void location_status_menu_item_init(LocationStatusMenuItem *self)
 		&err);
 
 	if (dbus_error_is_set(&err)) {
-		g_warning("location-sb: Failed to add match: %s", err.message);
+		status_debug("location-sb: Failed to add match: %s", err.message);
 		dbus_error_free(&err);
-		/* XXX: Clean up dbus */
 		return;
 	}
 
@@ -214,34 +236,33 @@ static void location_status_menu_item_init(LocationStatusMenuItem *self)
 		&err);
 
 	if (dbus_error_is_set(&err)) {
-		g_warning("location-sb: Failed to add match: %s", err.message);
+		status_debug("location-sb: Failed to add match: %s", err.message);
 		dbus_error_free(&err);
-		/* XXX: Clean up dbus */
 		return;
 	}
 
 	if (!dbus_connection_add_filter(p->dbus,
 			(DBusHandleMessageFunction)on_locationdaemon_signal,
 			self, NULL)) {
-		g_warning("location-sb: Failed to add dbus filter");
-		/* XXX: Clean up dbus */
+		status_debug("location-sb: Failed to add dbus filter");
 		return;
 	}
 
 	theme = gtk_icon_theme_get_default();
-	p->pix16_gps_searching = gtk_icon_theme_load_icon(theme,
-		"gps_searching", 16, 0, NULL);
-	p->pix16_gps_location = gtk_icon_theme_load_icon(theme,
-		"gps_location", 16, 0, NULL);
-	p->pix16_gps_not_connected = gtk_icon_theme_load_icon(theme,
-		"gps_not_not_connected", 16, 0, NULL);
+	p->pix18_gps_searching = gtk_icon_theme_load_icon(theme,
+		"gps_searching", 18, 0, NULL);
+	p->pix18_gps_location = gtk_icon_theme_load_icon(theme,
+		"gps_location", 18, 0, NULL);
+	p->pix18_gps_not_connected = gtk_icon_theme_load_icon(theme,
+		"gps_not_connected", 18, 0, NULL);
 	p->pix48_gps_location = gtk_icon_theme_load_icon(theme,
+		"gps_location", 48, 0, NULL);
+	p->pix48_gps_not_connected = gtk_icon_theme_load_icon(theme,
 		"gps_not_connected", 48, 0, NULL);
 
-	p->osso = osso_initialize("location-sb", "0.106", FALSE, NULL);
+	p->osso = osso_initialize("location-sb", VERSION, FALSE, NULL);
 
-	hd_status_plugin_item_set_status_area_icon(
-		HD_STATUS_PLUGIN_ITEM(self), NULL);
+	set_status_icon(self, NULL);
 
 	p->status_button = hildon_button_new_with_text(
 		HILDON_SIZE_FINGER_HEIGHT,
@@ -254,11 +275,7 @@ static void location_status_menu_item_init(LocationStatusMenuItem *self)
 
 	hildon_button_set_style(HILDON_BUTTON(p->status_button),
 		 HILDON_BUTTON_STYLE_PICKER);
-
-	hildon_button_set_image(HILDON_BUTTON(p->status_button),
-		gtk_image_new_from_pixbuf(p->pix48_gps_location));
-
-	hildon_button_set_image_position(HILDON_BUTTON(p->status_button),0);
+	set_button_icon(self, p->pix48_gps_not_connected);
 
 	g_signal_connect_data(p->status_button, "clicked",
 		G_CALLBACK(execute_cp_plugin), self, 0, 0);
