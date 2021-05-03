@@ -1,3 +1,11 @@
+location-status (0.111-1) unstable; urgency=medium
+
+  * Fix bug where status menu wouldn't close in execute_cp_plugin.
+  * Use OSSO_ERROR instead of -1.
+  * Do not install .la files.
+
+ -- Ivan J. <parazyd@dyne.org>  Mon, 03 May 2021 21:24:07 +0200
+
 location-status (0.110-1) unstable; urgency=low
 
   * Initial Leste implementation.
