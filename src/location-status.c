@@ -103,6 +103,9 @@ static int fix_acquiring_cb(gpointer obj)
 {
 	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
 
+	if (p->fix-status == LOCATION_GPS_DEVICE_MODE_NOT_SEEN)
+		return 1;
+
 	if (p->fix_status != LOCATION_GPS_DEVICE_MODE_NO_FIX)
 		return 0;
 
