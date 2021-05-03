@@ -1,5 +1,5 @@
 AC_PREREQ[(2.69)]
-AC_INIT([location-status], [0.106], [parazyd@dyne.org])
+AC_INIT([location-status], [0.110], [parazyd@dyne.org])
 AC_CONFIG_SRCDIR([src])
 AM_INIT_AUTOMAKE
 LT_INIT([shared disable-static])
@@ -17,8 +17,8 @@ AC_SUBST(LS_LIBS)
 PKG_CHECK_MODULES(LL, liblocation)
 AC_SUBST(LL_CFLAGS)
 
-hildonstatusmenudesktopentrydir="`$PKG_CONFIG --variable=hildonstatusmenudesktopentrydir libhildondesktop-1`"
-AC_SUBST(hildonstausmenudesktopentrydir)
+hildonhomedesktopdir="`$PKG_CONFIG --variable=hildonstatusmenudesktopentrydir libhildondesktop-1`"
+AC_SUBST(hildonhomedesktopdir)
 
 hildondesktoplibdir="`$PKG_CONFIG --variable=hildondesktoplibdir libhildondesktop-1`"
 AC_SUBST(hildondesktoplibdir)
