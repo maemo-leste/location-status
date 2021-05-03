@@ -61,7 +61,8 @@ struct _LocationStatusMenuItemPrivate
 	GdkPixbuf *pix48_gps_location;
 	GdkPixbuf *pix48_gps_not_connected;
 	int locationdaemon_running;
-	LocationGPSDeviceMode fix_status;
+	LocationGPSDeviceMode prev_mode;
+	LocationGPSDeviceMode curr_mode;
 	CurStatusIcon current_status_icon;
 	GtkWidget *status_button;
 };
@@ -103,22 +104,24 @@ static int fix_acquiring_cb(gpointer obj)
 {
 	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
 
-	if (p->fix-status == LOCATION_GPS_DEVICE_MODE_NOT_SEEN)
+	if (p->locationdaemon_running == 0)
+		return 0;
+
+	if (p->prev_mode == LOCATION_GPS_DEVICE_MODE_NOT_SEEN)
 		return 1;
 
-	if (p->fix_status != LOCATION_GPS_DEVICE_MODE_NO_FIX)
+	if (p->prev_mode != LOCATION_GPS_DEVICE_MODE_NO_FIX)
 		return 0;
 
 	switch (p->current_status_icon) {
-	case STATUS_ICON_SEARCHING:
-		set_status_icon(obj, p->pix18_gps_location);
-		p->current_status_icon = STATUS_ICON_FOUND;
-		break;
 	case STATUS_ICON_FOUND:
 		set_status_icon(obj, p->pix18_gps_searching);
 		p->current_status_icon = STATUS_ICON_SEARCHING;
 		break;
+	case STATUS_ICON_SEARCHING:
 	default:
+		set_status_icon(obj, p->pix18_gps_location);
+		p->current_status_icon = STATUS_ICON_FOUND;
 		break;
 	}
 
@@ -136,17 +139,17 @@ static int fix_acquired(gpointer obj)
 static int handle_fixstatus(gpointer obj, DBusMessage *msg)
 {
 	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
-	short mode;
 
-	dbus_message_get_args(msg, NULL, DBUS_TYPE_BYTE, &mode, DBUS_TYPE_INVALID);
+	dbus_message_get_args(msg, NULL, DBUS_TYPE_BYTE,
+		&p->curr_mode, DBUS_TYPE_INVALID);
 
-	if (mode == p->fix_status)
+	if (p->curr_mode == p->prev_mode)
 		return 1;
 
-	p->fix_status = mode;
+	p->prev_mode = p->curr_mode;
 
 	/* Either static icon, or blink cb */
-	switch (mode) {
+	switch (p->curr_mode) {
 	case LOCATION_GPS_DEVICE_MODE_NO_FIX:
 		g_timeout_add_seconds(1, fix_acquiring_cb, obj);
 		break;
@@ -209,7 +212,8 @@ static void location_status_menu_item_init(LocationStatusMenuItem *self)
 	dbus_error_init(&err);
 
 	p->locationdaemon_running = 0;
-	p->fix_status = LOCATION_GPS_DEVICE_MODE_NOT_SEEN;
+	p->prev_mode = LOCATION_GPS_DEVICE_MODE_NOT_SEEN;
+	p->curr_mode = LOCATION_GPS_DEVICE_MODE_NOT_SEEN;
 
 	p->dbus = hd_status_plugin_item_get_dbus_connection(
 		HD_STATUS_PLUGIN_ITEM(self),
