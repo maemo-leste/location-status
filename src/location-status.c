@@ -78,8 +78,9 @@ HD_DEFINE_PLUGIN_MODULE_EXTENDED(LocationStatusMenuItem,
 static int execute_cp_plugin(gpointer obj)
 {
 	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
+	GtkWidget *toplevel = gtk_widget_get_toplevel(p->container);
+	gtk_widget_hide(toplevel);
 
-	/* BUG: The status menu doesn't close when button is clicked */
 	if (osso_cp_plugin_execute(
 			p->osso, "liblocation_applet.so", obj, TRUE) == OSSO_ERROR)
 		status_debug("location-sb: Error starting location cp applet");
