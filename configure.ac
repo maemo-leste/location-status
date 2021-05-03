@@ -10,9 +10,12 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AM_PROG_LIBTOOL
 
-PKG_CHECK_MODULES(LS, hildon-1 libhildondesktop-1 dbus-glib-1 dbus-1 libosso liblocation)
+PKG_CHECK_MODULES(LS, hildon-1 libhildondesktop-1 dbus-glib-1 dbus-1 libosso)
 AC_SUBST(LS_CFLAGS)
 AC_SUBST(LS_LIBS)
+
+PKG_CHECK_MODULES(LL, liblocation)
+AC_SUBST(LL_CFLAGS)
 
 hildonstatusmenudesktopentrydir="`$PKG_CONFIG --variable=hildonstatusmenudesktopentrydir libhildondesktop-1`"
 AC_SUBST(hildonstausmenudesktopentrydir)
