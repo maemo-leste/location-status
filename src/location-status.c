@@ -17,38 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#include <config.h>
-
-#include <dbus/dbus-glib-lowlevel.h>
-#include <hildon/hildon.h>
-#include <libhildondesktop/libhildondesktop.h>
-#include <libosso.h>
 #include <location/location-gps-device.h>
+
+#include "location-status.h"
 
 /* Use this for debugging */
 #include <syslog.h>
 #define status_debug(...) syslog(1, __VA_ARGS__)
 
-typedef struct _LocationStatusMenuItem        LocationStatusMenuItem;
-typedef struct _LocationStatusMenuItemClass   LocationStatusMenuItemClass;
-typedef struct _LocationStatusMenuItemPrivate LocationStatusMenuItemPrivate;
-
-struct _LocationStatusMenuItem
-{
-	HDStatusMenuItem parent;
-	LocationStatusMenuItemPrivate *priv;
-};
-
-struct _LocationStatusMenuItemClass
-{
-	HDStatusMenuItemClass parent;
-};
-
-typedef enum {
-	STATUS_ICON_NOT_CONNECTED,
-	STATUS_ICON_SEARCHING,
-	STATUS_ICON_FOUND
-} CurStatusIcon;
+HD_DEFINE_PLUGIN_MODULE(LocationStatusMenuItem,
+	location_status_menu_item, HD_TYPE_STATUS_MENU_ITEM)
 
 struct _LocationStatusMenuItemPrivate
 {
@@ -67,44 +45,39 @@ struct _LocationStatusMenuItemPrivate
 	GtkWidget *status_button;
 };
 
-GType location_status_menu_item_get_type(void);
 
-HD_DEFINE_PLUGIN_MODULE_EXTENDED(LocationStatusMenuItem,
-	location_status_menu_item, HD_TYPE_STATUS_MENU_ITEM,
-	G_ADD_PRIVATE_DYNAMIC(LocationStatusMenuItem),,);
-
-#define GET_PRIVATE(x) location_status_menu_item_get_instance_private(x)
-
-static int execute_cp_plugin(gpointer obj)
+static int execute_cp_plugin(LocationStatusMenuItem *plugin)
 {
-	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
-	GtkWidget *toplevel = gtk_widget_get_toplevel(p->container);
-	gtk_widget_hide(toplevel);
+	LocationStatusMenuItemPrivate *p = LOCATION_STATUS(plugin)->priv;
+	//GtkWidget *toplevel = gtk_widget_get_toplevel(p->container);
+	//gtk_widget_hide(toplevel);
 
 	if (osso_cp_plugin_execute(
-			p->osso, "liblocation_applet.so", obj, TRUE) == OSSO_ERROR)
+			p->osso, "liblocation_applet.so", (gpointer)plugin, TRUE) == OSSO_ERROR)
+			//p->osso, "liblocation_applet.so", (gpointer)plugin, TRUE) == OSSO_ERROR)
 		status_debug("location-sb: Error starting location cp applet");
 
 	return 0;
 }
 
-static void set_status_icon(gpointer obj, GdkPixbuf *pixbuf)
+static void set_status_icon(LocationStatusMenuItem *plugin, GdkPixbuf *pixbuf)
 {
-	hd_status_plugin_item_set_status_area_icon(
-		HD_STATUS_PLUGIN_ITEM(obj), pixbuf);
+	hd_status_plugin_item_set_status_area_icon(HD_STATUS_PLUGIN_ITEM(plugin), pixbuf);
 }
 
-static void set_button_icon(gpointer obj, GdkPixbuf *pixbuf)
+static void set_button_icon(LocationStatusMenuItem *plugin, GdkPixbuf *pixbuf)
 {
-	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
+	LocationStatusMenuItemPrivate *p = LOCATION_STATUS(plugin)->priv;
+
 	hildon_button_set_image(HILDON_BUTTON(p->status_button),
 		gtk_image_new_from_pixbuf(pixbuf));
+
 	hildon_button_set_image_position(HILDON_BUTTON(p->status_button), 0);
 }
 
-static int fix_acquiring_cb(gpointer obj)
+static int fix_acquiring_cb(LocationStatusMenuItem *plugin)
 {
-	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
+	LocationStatusMenuItemPrivate *p = LOCATION_STATUS(plugin)->priv;
 
 	if (p->locationdaemon_running == 0)
 		return 0;
@@ -117,12 +90,12 @@ static int fix_acquiring_cb(gpointer obj)
 
 	switch (p->current_status_icon) {
 	case STATUS_ICON_FOUND:
-		set_status_icon(obj, p->pix18_gps_searching);
+		set_status_icon(plugin, p->pix18_gps_searching);
 		p->current_status_icon = STATUS_ICON_SEARCHING;
 		break;
 	case STATUS_ICON_SEARCHING:
 	default:
-		set_status_icon(obj, p->pix18_gps_location);
+		set_status_icon(plugin, p->pix18_gps_location);
 		p->current_status_icon = STATUS_ICON_FOUND;
 		break;
 	}
@@ -130,17 +103,17 @@ static int fix_acquiring_cb(gpointer obj)
 	return 1;
 }
 
-static int fix_acquired(gpointer obj)
+static int fix_acquired(LocationStatusMenuItem *plugin)
 {
-	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
-	set_status_icon(obj, p->pix18_gps_location);
+	LocationStatusMenuItemPrivate *p = LOCATION_STATUS_MENU_ITEM_GET_PRIVATE(plugin);
+	set_status_icon(plugin, p->pix18_gps_location);
 	p->current_status_icon = STATUS_ICON_FOUND;
 	return 0;
 }
 
-static int handle_fixstatus(gpointer obj, DBusMessage *msg)
+static int handle_fixstatus(LocationStatusMenuItem *plugin, DBusMessage *msg)
 {
-	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
+	LocationStatusMenuItemPrivate *p = LOCATION_STATUS_MENU_ITEM_GET_PRIVATE(plugin);
 
 	dbus_message_get_args(msg, NULL, DBUS_TYPE_BYTE,
 		&p->curr_mode, DBUS_TYPE_INVALID);
@@ -153,11 +126,11 @@ static int handle_fixstatus(gpointer obj, DBusMessage *msg)
 	/* Either static icon, or blink cb */
 	switch (p->curr_mode) {
 	case LOCATION_GPS_DEVICE_MODE_NO_FIX:
-		g_timeout_add_seconds(1, fix_acquiring_cb, obj);
+		g_timeout_add_seconds(1, (GSourceFunc)fix_acquiring_cb, plugin);
 		break;
 	case LOCATION_GPS_DEVICE_MODE_2D:
 	case LOCATION_GPS_DEVICE_MODE_3D:
-		fix_acquired(obj);
+		fix_acquired(plugin);
 		break;
 	default:
 		break;
@@ -166,10 +139,10 @@ static int handle_fixstatus(gpointer obj, DBusMessage *msg)
 	return 1;
 }
 
-static int handle_running(gpointer obj, DBusMessage *msg)
+static int handle_running(LocationStatusMenuItem *plugin, DBusMessage *msg)
 {
 	/* Either show or hide status icon */
-	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
+	LocationStatusMenuItemPrivate *p = LOCATION_STATUS_MENU_ITEM_GET_PRIVATE(plugin);
 
 	dbus_message_get_args(msg, NULL, DBUS_TYPE_BYTE,
 		&p->locationdaemon_running, DBUS_TYPE_INVALID);
@@ -177,13 +150,13 @@ static int handle_running(gpointer obj, DBusMessage *msg)
 	switch (p->locationdaemon_running) {
 	case 0:
 		/* Stopped */
-		set_status_icon(obj, NULL);
-		set_button_icon(obj, p->pix48_gps_not_connected);
+		set_status_icon(plugin, NULL);
+		set_button_icon(plugin, p->pix48_gps_not_connected);
 		break;
 	case 1:
 		/* Started */
-		set_status_icon(obj, p->pix18_gps_not_connected);
-		set_button_icon(obj, p->pix48_gps_location);
+		set_status_icon(plugin, p->pix18_gps_not_connected);
+		set_button_icon(plugin, p->pix48_gps_location);
 		break;
 	default:
 		break;
@@ -192,24 +165,29 @@ static int handle_running(gpointer obj, DBusMessage *msg)
 	return 1;
 }
 
-static int on_locationdaemon_signal(int unused, DBusMessage *msg, gpointer obj)
+static int on_locationdaemon_signal(int unused, DBusMessage *msg, LocationStatusMenuItem *plugin)
 {
 	if (dbus_message_is_signal(msg, "org.maemo.LocationDaemon.Device",
 			"FixStatusChanged"))
-		return handle_fixstatus(obj, msg);
+		return handle_fixstatus(plugin, msg);
 
 	if (dbus_message_is_signal(msg, "org.maemo.LocationDaemon.Running",
 			"Running"))
-		return handle_running(obj, msg);
+		return handle_running(plugin, msg);
 
 	return 1;
 }
 
 static void location_status_menu_item_init(LocationStatusMenuItem *self)
 {
-	LocationStatusMenuItemPrivate *p = GET_PRIVATE(self);
+	LocationStatusMenuItemPrivate *p = LOCATION_STATUS_MENU_ITEM_GET_PRIVATE(self);
 	GtkIconTheme *theme;
 	DBusError err;
+
+    self->priv = p;
+
+    memset(p, 0, sizeof(LocationStatusMenuItemPrivate));
+
 
 	dbus_error_init(&err);
 
@@ -269,7 +247,7 @@ static void location_status_menu_item_init(LocationStatusMenuItem *self)
 	p->pix48_gps_not_connected = gtk_icon_theme_load_icon(theme,
 		"gps_not_connected", 48, 0, NULL);
 
-	p->osso = osso_initialize("location-sb", VERSION, FALSE, NULL);
+	p->osso = osso_initialize("location-sb", VERSION, TRUE, NULL);
 
 	set_status_icon(self, NULL);
 
@@ -293,9 +271,9 @@ static void location_status_menu_item_init(LocationStatusMenuItem *self)
 	gtk_widget_show_all(GTK_WIDGET(self));
 }
 
-static void location_status_menu_item_finalize(gpointer obj)
+static void location_status_menu_item_finalize(GObject* obj)
 {
-	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
+	LocationStatusMenuItemPrivate *p = LOCATION_STATUS_MENU_ITEM_GET_PRIVATE(obj);
 
 	if (p->osso)
 		osso_deinitialize(p->osso);
@@ -318,7 +296,12 @@ static void location_status_menu_item_finalize(gpointer obj)
 
 static void location_status_menu_item_class_init(LocationStatusMenuItemClass *klass)
 {
-	return;
+   GObjectClass *object_class = G_OBJECT_CLASS (klass);
+
+   object_class->finalize = location_status_menu_item_finalize;
+   /* TODO: dispose ? */
+
+   g_type_class_add_private (klass, sizeof (LocationStatusMenuItemPrivate));
 }
 
 static void location_status_menu_item_class_finalize(LocationStatusMenuItemClass *klass)
