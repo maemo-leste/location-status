@@ -1,3 +1,9 @@
+location-status (0.112-1) unstable; urgency=medium
+
+  * Clean up and potentially magically fix segfault.
+
+ -- Ivan J. <parazyd@dyne.org>  Thu, 06 May 2021 08:15:46 +0200
+
 location-status (0.111-1) unstable; urgency=medium
 
   * Fix bug where status menu wouldn't close in execute_cp_plugin.
