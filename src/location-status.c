@@ -53,7 +53,6 @@ typedef enum {
 struct _LocationStatusMenuItemPrivate
 {
 	osso_context_t *osso;
-	GtkContainer *container;
 	DBusConnection *dbus;
 	GdkPixbuf *pix18_gps_searching;
 	GdkPixbuf *pix18_gps_location;
@@ -69,21 +68,21 @@ struct _LocationStatusMenuItemPrivate
 
 GType location_status_menu_item_get_type(void);
 
-HD_DEFINE_PLUGIN_MODULE_EXTENDED(LocationStatusMenuItem,
-	location_status_menu_item, HD_TYPE_STATUS_MENU_ITEM,
-	G_ADD_PRIVATE_DYNAMIC(LocationStatusMenuItem),,);
+HD_DEFINE_PLUGIN_MODULE_WITH_PRIVATE(LocationStatusMenuItem,
+	location_status_menu_item, HD_TYPE_STATUS_MENU_ITEM);
 
 #define GET_PRIVATE(x) location_status_menu_item_get_instance_private(x)
 
-static int execute_cp_plugin(gpointer obj)
+static int execute_cp_plugin(GtkWidget *btn, LocationStatusMenuItem *obj)
 {
 	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
-	GtkWidget *toplevel = gtk_widget_get_toplevel(p->container);
+	GtkWidget *toplevel = gtk_widget_get_toplevel(GTK_WIDGET(obj));
 	gtk_widget_hide(toplevel);
 
 	if (osso_cp_plugin_execute(
 			p->osso, "liblocation_applet.so", obj, TRUE) == OSSO_ERROR)
-		status_debug("location-sb: Error starting location cp applet");
+		hildon_banner_show_information(NULL, NULL,
+			"Failed to show location settings");
 
 	return 0;
 }
@@ -192,8 +191,10 @@ static int handle_running(gpointer obj, DBusMessage *msg)
 	return 1;
 }
 
-static int on_locationdaemon_signal(int unused, DBusMessage *msg, gpointer obj)
+static int on_locationdaemon_signal(DBusConnection *dbus, DBusMessage *msg, gpointer obj)
 {
+	(void)dbus;
+
 	if (dbus_message_is_signal(msg, "org.maemo.LocationDaemon.Device",
 			"FixStatusChanged"))
 		return handle_fixstatus(obj, msg);
@@ -293,12 +294,9 @@ static void location_status_menu_item_init(LocationStatusMenuItem *self)
 	gtk_widget_show_all(GTK_WIDGET(self));
 }
 
-static void location_status_menu_item_finalize(gpointer obj)
+static void location_status_menu_item_finalize(GObject *obj)
 {
 	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
-
-	if (p->osso)
-		osso_deinitialize(p->osso);
 
 	if (p->dbus) {
 		dbus_bus_remove_match(p->dbus,
@@ -313,15 +311,19 @@ static void location_status_menu_item_finalize(gpointer obj)
 		p->dbus = NULL;
 	}
 
+	if (p->osso)
+		osso_deinitialize(p->osso);
+
 	G_OBJECT_CLASS(location_status_menu_item_parent_class)->finalize(obj);
 }
 
 static void location_status_menu_item_class_init(LocationStatusMenuItemClass *klass)
 {
-	return;
+	GObjectClass *object_class = G_OBJECT_CLASS(klass);
+	object_class->finalize = location_status_menu_item_finalize;
 }
 
 static void location_status_menu_item_class_finalize(LocationStatusMenuItemClass *klass)
 {
-	return;
+	(void)klass;
 }

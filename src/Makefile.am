@@ -3,7 +3,7 @@ desktoplibdir = $(hildondesktoplibdir)
 
 location_status_la_SOURCES = location-status.c
 
-location_status_la_CFLAGS  = $(LS_CFLAGS) $(LL_CFLAGS)
+location_status_la_CFLAGS  = $(LS_CFLAGS) $(LL_CFLAGS) -Wall -Wextra
 location_status_la_LIBADD  = $(LS_LIBS)
 location_status_la_LDFLAGS = -module -avoid-version -Wl,--as-needed
 
