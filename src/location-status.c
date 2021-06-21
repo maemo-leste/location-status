@@ -178,11 +178,13 @@ static int handle_running(gpointer obj, DBusMessage *msg)
 		/* Stopped */
 		set_status_icon(obj, NULL);
 		set_button_icon(obj, p->pix48_gps_not_connected);
+		gtk_widget_hide_all(GTK_WIDGET(obj));
 		break;
 	case 1:
 		/* Started */
 		set_status_icon(obj, p->pix18_gps_not_connected);
 		set_button_icon(obj, p->pix48_gps_location);
+		gtk_widget_show_all(GTK_WIDGET(obj));
 		break;
 	default:
 		break;
@@ -291,7 +293,6 @@ static void location_status_menu_item_init(LocationStatusMenuItem *self)
 		G_CALLBACK(execute_cp_plugin), self, 0, 0);
 
 	gtk_container_add(GTK_CONTAINER(self), p->status_button);
-	gtk_widget_show_all(GTK_WIDGET(self));
 }
 
 static void location_status_menu_item_finalize(GObject *obj)
