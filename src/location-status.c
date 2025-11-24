@@ -297,7 +297,7 @@ static void location_status_menu_item_init(LocationStatusMenuItem *self)
 
 static void location_status_menu_item_finalize(GObject *obj)
 {
-	LocationStatusMenuItemPrivate *p = GET_PRIVATE(obj);
+	LocationStatusMenuItemPrivate *p = GET_PRIVATE((LocationStatusMenuItem*)obj);
 
 	if (p->dbus) {
 		dbus_bus_remove_match(p->dbus,
