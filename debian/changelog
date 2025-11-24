@@ -1,3 +1,9 @@
+location-status (0.114-1) unstable; urgency=medium
+
+  * Fix compilation error
+
+ -- Merlijn Wajer <merlijn@wizzup.org>  Mon, 24 Nov 2025 14:43:45 +0100
+
 location-status (0.113-1) unstable; urgency=medium
 
   * Hide status menu button when GPS is inactive.
